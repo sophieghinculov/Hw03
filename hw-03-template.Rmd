@@ -133,7 +133,13 @@ tidy(gss16_fit_1)
 #### Exercise 3 (a)
 
 ```{r}
-# replace this with your code
+gss16_test_predictions <-
+  gss16_fit_1 %>%
+  predict(gss16_test, type = "prob") %>%
+  bind_cols(gss16_test)
+roc_curve_data <- roc_curve(gss16_test_predictions, truth = advfront, .pred_Agree)
+
+autoplot(gss16_test_predictions)
 ```
 
 *Your answer here*
