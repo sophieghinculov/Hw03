@@ -62,18 +62,23 @@ gss16_advfront <- gss16_advfront %>%
 #### Exercise 1 (a)
 
 ```{r}
-# replace this with your code
+model_1 <- lm(emailhr ~ educ, data = gss16_advfront)
+summary(model_1)
 ```
 
-*Your answer here*
+The formula for the line-of-best fit based on the above data is y = 0.6854x - 2.7573. For every one additional increase in education level, the number of hours spent on email weekly will increase by 0.6854 on average. Furthermore at a 0 education level, the predicted number of hours spent on email is -2.7573.
 
 #### Exercise 1 (b)
 
 ```{r}
-# replace this with your code
-```
+glance(model_1)
 
-*Your answer here*
+par(mfrow = c(1, 2))
+plot(model_1, which = 1)
+plot(model_1, which = 2)
+par(mfrow = c(1, 1))
+```
+In model 1, the model statistics show that there is an r squared value of 0.02911947. This shows that roughly 2.91% of the variation in the number of hours of email usage can be explained by the number of years of education. In model 1 there is also a high level of statistical significance since the p value is very small, or less than 0.001. However despite the high significance of this F-test, since p < 0.001, the model has a low explanatory power. The next diagnostic plots explain the overall sustainability of the model. On the residual plot, there is not a clear patter and on the residual vs. fitted plot there is little pattern as well. This randomness with a lack of a strong shape indicates that the model is approximately linear, satisfying the linearity condition. In the QQ-plot there are only slight variations around the tail, but overall variations are low. This small level of variability is not enough to say that the residuals are not normally distributed, thus does not rule out the model. Overall the linear regression assumptions are are satisfied for the model, however, due to the fact that the r-squared value is small the model only can only explain a small part of the variation, making the model's effectiveness somewhat limited. Furthermore, education level alone is not the most accurate way to determine what causes the number of hours spent on email. 
 
 ## Exercise 2: Create a workflow to fit a model
 
@@ -87,9 +92,15 @@ gss16_test  <- testing(gss16_split)
 #### Exercise 2 (a)
 
 ```{r}
-# replace this with your code
+gss16_rec_1 <- recipe(advfront ~ educ, data = gss16_train)
+gss16_mod_1 <-
+  logistic_reg(mode = "classification") %>%
+  set_engine("glm")
+gss16_wflow_1 <-
+  workflow() %>%
+  add_model(gss16_mod_1)
+gss16_wflow_1
 ```
-
 *Your answer here*
 
 #### Exercise 2 (b)
@@ -98,12 +109,21 @@ gss16_test  <- testing(gss16_split)
 # replace this with your code
 ```
 
-*Your answer here*
+A logistic regression model best fits the needs of this scenario because it is specifically used to predict the probability of an event happening. In this scenario, we want to predict whether or not someone agrees or disagrees with the statement "even if it brings no immediate benefits, scientific research that advances the frontiers of knowledge is necessary and should be supported by the federal government." Thus there are only two possible outcomes, so a logistic regression model can be used to predict the probability of someone choosing either outcome. 
 
 #### Exercise 2 (c)
 
 ```{r}
-# replace this with your code
+gss16_workflow <-
+  workflow() %>%
+  add_model(logistic_reg() %>% set_engine("glm")) %>%
+  add_recipe(gss16_rec_1)
+
+gss16_fit_1 <-
+  gss16_workflow %>%
+  fit(data = gss16_train)
+
+tidy(gss16_fit_1)
 ```
 
 *Your answer here*
