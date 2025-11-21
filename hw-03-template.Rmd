@@ -133,13 +133,13 @@ tidy(gss16_fit_1)
 #### Exercise 3 (a)
 
 ```{r}
-gss16_test_predictions <-
-  gss16_fit_1 %>%
-  predict(gss16_test, type = "prob") %>%
-  bind_cols(gss16_test)
-roc_curve_data <- roc_curve(gss16_test_predictions, truth = advfront, .pred_Agree)
-
-autoplot(gss16_test_predictions)
+gss16_test_predictions <- predict(gss16_fit_1, gss16_test, type = "prob") %>%
+  bind_cols(gss16_test %>%
+              select(advfront))
+gss16_test_predictions %>%
+  roc_curve(truth = advfront, .pred_Agree) %>%
+  autoplot()
+ 
 ```
 
 *Your answer here*
@@ -147,7 +147,22 @@ autoplot(gss16_test_predictions)
 #### Exercise 3 (b)
 
 ```{r}
-# replace this with your code
+gss16_test_predictions <- predict(gss16_fit_1, gss16_test, type = "prob") %>%
+  bind_cols(gss16_test %>%
+              select(advfront))
+gss16_test_predictions <- gss16_test_predictions %>%
+  mutate(pred_class = factor(
+    if_else(.pred_Agree > 0.83, "Agree", "Not agree"),
+    levels = c("Not agree", "Agree")
+  ))
+conf_mat_1 <- conf_mat(
+  gss16_test_predictions,
+  truth = advfront,
+  estimate = pred_class
+)
+
+conf_mat_1
+
 ```
 
 *Your answer here*
