@@ -140,6 +140,11 @@ gss16_test_predictions %>%
   roc_curve(truth = advfront, .pred_Agree) %>%
   autoplot()
  
+auc_res <- gss16_test_predictions %>%
+  roc_auc(
+    truth = advfront, .pred_Agree, event_level = "second"
+  )
+auc_res
 ```
 
 *Your answer here*
@@ -160,9 +165,15 @@ conf_mat_1 <- conf_mat(
   truth = advfront,
   estimate = pred_class
 )
-
 conf_mat_1
 
+cm_summary <- summary(conf_mat_1)
+cm_summary %>%
+  filter(.metric == "sens") %>%
+  pull(.estimate)
+cm_summary %>%
+  filter(.metric == "specs") %>%
+  pull(.estimate)
 ```
 
 *Your answer here*
@@ -172,7 +183,18 @@ conf_mat_1
 #### Exercise 4 (a)
 
 ```{r}
-# replace this with your code
+gss16_rec_2 <- recipe(advfront ~ polviews + wrkstat + emailhr + educ, data = gss16_train) %>%
+  step_dummy(all_nominal_predictors())
+gss16_mod_2 <- logistic_reg() %>%
+  set_engine("glm")
+
+gss16_wflow_2 <- workflow() %>%
+  add_recipe(gss16_rec_2) %>%
+  add_model(gss16_mod_2)
+
+gss16_fit_2 <- fit(gss16_wflow_2, data = gss16_train)
+
+
 ```
 
 *Your answer here*
@@ -180,7 +202,24 @@ conf_mat_1
 #### Exercise 4 (b)
   
 ```{r}
-# replace this with your code
+gss16_fit_2 <- gss16_wflow_2 %>%
+  fit(data = gss16_train)
+
+gss16_predictions_1 <- gss16_fit_2 %>%
+  predict(gss16_test, type = "prob") %>%
+  bind_cols(gss16_test)
+
+roc_curve_1 <- gss16_predictions_1 %>%
+  roc_curve(
+    truth = advfront, .pred_Agree, event_level = "second"
+  )
+autoplot(roc_curve_1)
+
+auc_results <- gss16_predictions_1 %>%
+  roc_auc(
+    truth = advfront, .pred_Agree, event_level = "second"
+  )
+auc_results
 ```
 
 *Your answer here*
@@ -191,5 +230,5 @@ conf_mat_1
 # replace this with your code
 ```
 
-*Your answer here*
+The model that performs better is model 1, gss16_fit_1. This is because there is more area under the curve in model 1 as compared to model 2, thus model 1 is more accurate. This is because the higher the AUC, the more significance the results of the model are. Thus because the AUC of model 1 is greater, the data is more meaningful. 
 
