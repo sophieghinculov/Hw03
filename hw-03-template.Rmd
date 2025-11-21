@@ -140,7 +140,7 @@ gss16_test_predictions %>%
   roc_curve(truth = advfront, .pred_Agree) %>%
   autoplot()
  
-auc_res <- gss16_test_predictions %>%
+results_1 <- gss16_test_predictions %>%
   roc_auc(
     truth = advfront, .pred_Agree, event_level = "second"
   )
@@ -152,26 +152,26 @@ auc_res
 #### Exercise 3 (b)
 
 ```{r}
-gss16_test_predictions <- predict(gss16_fit_1, gss16_test, type = "prob") %>%
+gss16_test_predictions_1 <- predict(gss16_fit_1, gss16_test, type = "prob") %>%
   bind_cols(gss16_test %>%
               select(advfront))
-gss16_test_predictions <- gss16_test_predictions %>%
+gss16_test_predictions_1 <- gss16_test_predictions %>%
   mutate(pred_class = factor(
     if_else(.pred_Agree > 0.83, "Agree", "Not agree"),
     levels = c("Not agree", "Agree")
   ))
-conf_mat_1 <- conf_mat(
-  gss16_test_predictions,
+conf_mat <- conf_mat(
+  gss16_test_predictions_1,
   truth = advfront,
   estimate = pred_class
 )
-conf_mat_1
+conf_mat
 
-cm_summary <- summary(conf_mat_1)
-cm_summary %>%
+summary_1 <- summary(conf_mat_1)
+summary_1 %>%
   filter(.metric == "sens") %>%
   pull(.estimate)
-cm_summary %>%
+summary_1 %>%
   filter(.metric == "specs") %>%
   pull(.estimate)
 ```
